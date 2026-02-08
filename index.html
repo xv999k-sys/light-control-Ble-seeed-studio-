@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>light</title>
+    <link rel="stylesheet" href="stayle.css">
+</head>
+
+<body>
+
+    <div id="on">
+
+
+        <input  id="on_green"   type="button" value="ON-Green">
+
+
+
+
+        <input   id="on_red" type="button" value="ON-Red">
+
+
+    </div>
+    <div class="slider-wrapper">
+
+        <label  id="label" for="range-green">Light Intensity💡</label>
+        <input id="range-green" type="range" value="100">
+        <span id="value-green">100%</span>
+
+    </div>
+    <div class="slider-wrapper-red">
+
+        <label  id="label-red"  for="range-red">Light Intensity💡 </label>
+        <input id="range-red" type="range" value="100">
+        <span id="value-red">100%</span>
+
+    </div>
+
+    <div>
+
+        <button id="connectBtn" type="button" class="ble-btn">🔵 Bluetooth</button>
+
+    </div>
+
+
+
+
+    <script>
+
+        let characteristic = null;
+        let isConnected = false;
+        let greenOn = false;
+        let redOn = false;
+
+
+        async function connectBLE() {
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'Karam' }],
+                    optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
+                });
+
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+                characteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
+
+                isConnected = true;
+                document.getElementById("connectBtn").classList.add("connected");
+                document.getElementById("connectBtn").innerText = "🟢 Connected";
+
+            } catch (e) {
+                alert("Bluetooth connection failed");
+                console.log(e);
+            }
+        }
+
+        document.getElementById("connectBtn").addEventListener("click", connectBLE);
+
+        async function send(cmd) {
+            if (!isConnected || !characteristic) {
+                alert("Bluetooth connection required first ⚠️");
+                return;
+            }
+            await characteristic.writeValue(new Uint8Array([cmd]));
+        }
+
+
+
+        
+        const greenButton = document.getElementById("on_green");
+        greenButton.addEventListener("click", async () => {
+            greenOn = !greenOn;
+
+            if (greenOn) {
+                greenButton.value = "OFF-Green";
+                await send(1); 
+            } else {
+                greenButton.value = "ON-Green";
+                await send(0); 
+            }
+        });
+
+        // ====== RED BUTTON ======
+        const redButton = document.getElementById("on_red");
+        redButton.addEventListener("click", async () => {
+            redOn = !redOn;
+
+            if (redOn) {
+                redButton.value = "OFF-Red";
+                await send(4); 
+            } else {
+                redButton.value = "ON-Red";
+                await send(5); 
+            }
+        });
+
+        
+        const rangeGreen = document.getElementById("range-green");
+        const valueGreen = document.getElementById("value-green");
+
+        rangeGreen.addEventListener("input", async () => {
+            if (!greenOn) return;
+            const value = parseInt(rangeGreen.value);
+            valueGreen.textContent = value + "%";
+            await send( 100 + Math.min(value, 99));
+        });
+
+
+     
+        const rangeRed = document.getElementById("range-red");
+        const valueRed = document.getElementById("value-red");
+
+        rangeRed.addEventListener("input", async () => {
+            if (!redOn) return; 
+            const value = parseInt(rangeRed.value);
+            valueRed.textContent = value + "%";
+            await send( 200 + Math.min(value, 99));
+        });
+
+
+
+    </script>
+
+
+
+
+
+
+</body>
+
+</html>
