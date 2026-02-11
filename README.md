@@ -66,9 +66,9 @@ MIT License – Free to use, modify, and share.
 
 Example predictions on validation images:
 
-![pred1](WhatsApp Image 2026-02-09 at 3.57.18 PM (2).jpeg)
+![pred1](WhatsApp Image 2026-02-09 at 3.57.18 PM (2).jpg)
 ________________________________________________________________________________________________________________________________
-![pred2](WhatsApp Image 2026-02-09 at 3.57.18 PM.jpeg)
+![pred2](WhatsApp Image 2026-02-09 at 3.57.18 PM.jpg)
 AR:
 
 التحكم في أضواء LED بالـ BLE باستخدام Seeed Studio nRF52840
